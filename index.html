@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html lang="es-AR" data-theme="dark" style="color-scheme: dark;"><head>
+<html lang="es-AR" data-theme="light" style="color-scheme: light;"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Alquileres en Miramar</title>
-<meta name="theme-color" content="#0B3C49">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
 <style>
@@ -93,19 +90,21 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .thumbs button{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:50%;border:0;background:var(--danger);color:#fff;cursor:pointer}
 .msg{grid-column:1/-1;color:var(--danger);min-height:1.2em}
 .actions{flex-wrap:wrap}.info{margin:0 0 10px;font-size:.92rem}.info summary{cursor:pointer;font-weight:600;min-height:36px;display:flex;align-items:center}.info p{margin:4px 0}.warn{margin:0 0 10px;font-size:.9rem;font-weight:600;color:var(--danger)}.help{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:14px}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ver{margin:0 0 6px;font-weight:600;font-size:.88rem;color:var(--pine)}.rep{margin:10px 0 0;font-size:.85rem}.rep a{color:var(--muted)}
 :focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 @media (min-width:560px){.filters{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
 <header class="hero">
-  <h1>Tu verano en Miramar</h1>
-  <p>Casas, departamentos y cabañas cerca del mar. Consultá directo con el propietario.</p>
+  <h1>Alquileres en Miramar</h1>
+  <p>Casas, departamentos y cabañas para vacaciones, trabajo y todo el año. Consultá directo con el propietario.</p>
   <svg class="wave" viewBox="0 0 400 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 18 C60 4 110 32 200 18 S340 4 400 18 V34 H0Z" fill="var(--bg)"></path></svg>
 </header>
 
 <main class="wrap">
   <section class="filters" aria-label="Filtros">
+    <label class="full">Tipo de alquiler<select id="ta"><option value="tur">Turístico (por días)</option><option value="fds">Fin de semana</option><option value="tra">Trabajo por la temporada</option><option value="anu">Todo el año</option></select></label>
     <details class="full" id="calD" open="">
       <summary id="sumTxt">Elegí tus fechas</summary>
       <div id="calWrap"></div>
@@ -113,15 +112,15 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
     </details>
     <label>Personas<select id="g"><option value="1">1 o más</option><option value="2">2 o más</option><option value="4">4 o más</option><option value="6">6 o más</option><option value="8">8 o más</option></select></label>
     <label>Distancia al mar<select id="b"><option value="99">Cualquiera</option><option value="2">Hasta 2 cuadras</option><option value="6">Hasta 6 cuadras</option><option value="12">Hasta 12 cuadras</option></select></label>
-    <label>Precio máximo por noche<input id="mp" type="number" min="0" inputmode="numeric" placeholder="Sin límite"></label>
-    <label>Tipo<select id="t"><option value="">Todos</option><option>Casa</option><option>Departamento</option><option>Cabaña</option></select></label>
+    <label>Zona<select id="zn"></select></label>
+    <label>Tipo de propiedad<select id="t"><option value="">Todos</option><option>Casa</option><option>Departamento</option><option>Cabaña</option></select></label>
+    <label id="mpLab">Precio máximo por noche<input id="mp" type="number" min="0" inputmode="numeric" placeholder="Sin límite"></label>
+    <label>Amueblado<select id="am"><option value="">Todos</option><option value="si">Solo amueblados</option></select></label>
+    <label id="gaLab">Garantía<select id="ga"><option value="">Todas</option><option value="no">No piden garantía</option><option value="si">Piden garantía</option></select></label>
+    <label>Ordenar<select id="ord"><option value="asc">Menor precio</option><option value="desc">Mayor precio</option></select></label>
+    <button class="btn alt full" id="favBtn" type="button" aria-pressed="false">♡ Ver solo favoritos</button>
   </section>
 
-  <details class="map" open="">
-    <summary>Zonas de Miramar</summary>
-    <svg id="map" viewBox="0 0 320 250" role="group" aria-label="Esquema de zonas"></svg>
-    <p class="note">Esquema de referencia, sin escala. Tocá una zona para filtrar.</p>
-  </details>
   <div id="chipBox"></div>
   <div class="help"><span>¿No sabés cuál elegir? Te ayudamos.</span><a class="btn" id="helpBtn" target="_blank" rel="noopener" href="#">Consultar a la administración</a></div>
 
@@ -132,8 +131,8 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   <p class="count" id="count" aria-live="polite"></p>
   <div id="list"></div>
 </main>
-<footer id="foot"></footer>
-<footer><a id="loginLink" style="text-decoration:underline;cursor:pointer">Acceso administrador</a></footer>
+<div class="wrap"><div class="help"><span>¿Tenés una propiedad? Publicala con nosotros.</span><a class="btn" id="pubBtn" target="_blank" rel="noopener" href="#">Quiero publicar</a></div></div>
+<footer><p>La administración verifica que el alojamiento existe. El trato y el pago se arreglan directamente entre el turista y el propietario. Si algo te parece sospechoso, usá el botón Denunciar de cada aviso.</p><p>Administración: WhatsApp <a id="admWa" href="#" target="_blank" rel="noopener">2291 540743</a></p><p id="foot"></p><p><a id="loginLink" style="text-decoration:underline;cursor:pointer">Acceso administrador</a></p></footer>
 <dialog id="ldlg"><div class="form"><h2>Acceso administrador</h2><label class="full">Correo<input id="l_m" type="email" autocomplete="username"></label><label class="full">Contraseña<input id="l_p" type="password" autocomplete="current-password"></label><p class="msg" id="l_msg" role="status"></p><button class="btn alt" id="l_c" type="button">Cancelar</button><button class="btn" id="l_ok" type="button">Ingresar</button></div></dialog>
 
 <dialog id="dlg"><div class="form">
@@ -160,8 +159,18 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
   <label class="full">Cómo alquila<select id="f_m"><option value="dias">Por días, con mínimo de noches</option><option value="sq">Por semana o por quincena</option><option value="q">Solo por quincena</option></select></label>
   <label id="mnLab">Mínimo de noches<input id="f_mn" type="number" min="1" max="30" inputmode="numeric"></label>
   <label class="chk full"><input id="f_gap" type="checkbox"> Ofrecer días sueltos cuando queda un hueco entre dos reservas</label>
-  <label class="chk full"><input id="f_ts" type="checkbox"> Se alquila por toda la temporada</label>
-  <label class="full">Precio de toda la temporada, en pesos (opcional)<input id="f_ps" type="number" min="0" inputmode="numeric"></label>
+  <fieldset class="full" style="border:1px solid var(--line);border-radius:8px"><legend>Tipos de alquiler que ofrece</legend><div class="bgrid"><label class="chk"><input type="checkbox" data-ta="tur"> Turístico</label><label class="chk"><input type="checkbox" data-ta="fds"> Fin de semana</label><label class="chk"><input type="checkbox" data-ta="tra"> Trabajo por temporada</label><label class="chk"><input type="checkbox" data-ta="anu"> Todo el año</label></div></fieldset>
+  <label class="full">Precio de la temporada completa, en pesos (trabajo)<input id="f_ps" type="number" min="0" inputmode="numeric"></label>
+  <label class="full">Precio por mes (alquiler de todo el año)<input id="f_pa" type="number" min="0" inputmode="numeric"></label>
+  <label>Disponible desde<input id="f_dd" type="date"></label>
+  <label>Expensas<input id="f_ex" placeholder="Incluidas, o $25.000 por mes"></label>
+  <fieldset class="full" style="border:1px solid var(--line);border-radius:8px"><legend>Servicios incluidos</legend><div class="bgrid"><label class="chk"><input type="checkbox" data-sv="Luz"> Luz</label><label class="chk"><input type="checkbox" data-sv="Gas"> Gas</label><label class="chk"><input type="checkbox" data-sv="Agua"> Agua</label><label class="chk"><input type="checkbox" data-sv="Wi-Fi"> Wi-Fi</label></div></fieldset>
+  <label class="chk"><input id="f_am" type="checkbox"> Amueblado</label>
+  <label class="chk"><input id="f_gar" type="checkbox"> Pide garantía</label>
+  <label class="chk full"><input id="f_alq" type="checkbox"> Todo el año: ya está alquilado (se oculta al público)</label>
+  <label class="full">Requisitos (depósito, tipo de garantía, contrato)<textarea id="f_rq" rows="2"></textarea></label>
+  <label class="full">Dirección o link de Google Maps (se muestra al público)<input id="f_dir" placeholder="Calle 14 entre 20 y 21"></label>
+  <label class="chk full"><input id="f_vf" type="checkbox"> Verificado por la administración</label>
   <fieldset class="full" style="border:1px solid var(--line);border-radius:8px"><legend>Reservas ya tomadas</legend>
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end">
       <label>Ingresa<input id="f_ra" type="date"></label><label>Sale<input id="f_rb" type="date"></label>
@@ -179,11 +188,14 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 
 <script>
 var SUPABASE_URL="https://ibxssiirrcwfnjiulihv.supabase.co",SUPABASE_KEY="sb_publishable_IClM77od1PlZRhkUGytBJQ_jgBy0IaN",BUCKET="fotos-alquileres";
-var db=null;try{if(/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL))db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
+var db=null;try{db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
+if("serviceWorker" in navigator)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){});
 var CHECKIN="14:00",CHECKOUT="10:00",SS="2026-12-01",SE="2027-03-01",DAY=864e5;
-var ADMIN_WA="5492291000000",PAGE_URL=location.href.split("#")[0];
+var ADMIN_WA="5492291540743",PAGE_URL=location.href.split("#")[0];
 var ONLY=((location.hash||"").match(/^#a(\d+)$/)||[])[1]||"";
 document.getElementById("helpBtn").href="https://wa.me/"+ADMIN_WA+"?text="+encodeURIComponent("Hola, estoy viendo Alquileres en Miramar y necesito ayuda para elegir.");
+document.getElementById("pubBtn").href="https://wa.me/"+ADMIN_WA+"?text="+encodeURIComponent("Hola, tengo una propiedad para alquilar y quiero publicarla en Alquileres en Miramar.");
+document.getElementById("admWa").href="https://wa.me/"+ADMIN_WA;
 function todayISO(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
 function stale(x){return !x.u||nights(x.u,todayISO())>15}
 function staleText(x){return x.u?"Sin actualizar hace "+nights(x.u,todayISO())+" días":"Sin fecha de actualización"}
@@ -231,7 +243,7 @@ function drawCal(){
   }
   $("calWrap").innerHTML=s+"</div>";
   var has=!!IN;
-  $("short").innerHTML='<button type="button" data-s="sem"'+(has?'':' disabled')+'>1 semana</button><button type="button" data-s="qui"'+(has?'':' disabled')+'>1 quincena</button><button type="button" data-s="tem">Toda la temporada</button><button type="button" data-s="ss">Semana Santa</button><button type="button" data-s="inv">Vacaciones de invierno</button>'+(has?'<button type="button" data-s="clr">Borrar fechas</button>':'');
+  $("short").innerHTML='<button type="button" data-s="sem"'+(has?'':' disabled')+'>1 semana</button><button type="button" data-s="qui"'+(has?'':' disabled')+'>1 quincena</button><button type="button" data-s="ss">Semana Santa</button><button type="button" data-s="inv">Vacaciones de invierno</button>'+(has?'<button type="button" data-s="clr">Borrar fechas</button>':'');
   $("sumTxt").textContent=IN&&OUT?"Ingreso "+fmt(IN)+" · Salida "+fmt(OUT)+" · "+nights(IN,OUT)+" noches":IN?"Ingreso "+fmt(IN)+": elegí la salida":"Elegí tus fechas";
 }
 $("calWrap").addEventListener("click",function(e){
@@ -252,57 +264,71 @@ $("short").addEventListener("click",function(e){
 });
 
 /* ---------- listado ---------- */
+var TIPOS={tur:"Turístico",fds:"Fin de semana",tra:"Trabajo por la temporada",anu:"Todo el año"};
+function tipos(x){var a=(x.ta&&x.ta.length)?x.ta.slice():["tur"];if(x.ts&&a.indexOf("tra")<0)a.push("tra");a=a.map(function(k){return k==="men"?"anu":k});return a.filter(function(k,i){return a.indexOf(k)===i})}
+function offered(x){var a=tipos(x);return x.alq?a.filter(function(k){return k!=="anu"}):a}
+function pk(x,TA){return TA==="anu"?(x.pa||0):TA==="tra"?(x.ps||0):minP(x)}
+function ruleLine(x,TA){return TA==="fds"?"Alquila fines de semana, sin mínimo de noches.":TA==="tra"?"Para quien viene a trabajar por la temporada.":TA==="anu"?"Alquiler de todo el año, con contrato.":ruleText(x)}
+function mapUrl(x){return /^https?:\/\//i.test(x.dir)?x.dir:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(x.dir+", Miramar, Buenos Aires, Argentina")}
+var FAV=[],ONLYFAV=false;try{FAV=JSON.parse(localStorage.getItem("mir-fav")||"[]")}catch(e){}
+function saveFav(){try{localStorage.setItem("mir-fav",JSON.stringify(FAV))}catch(e){}}
+$("zn").innerHTML='<option value="">Todas</option>'+ZONES.map(function(z){return '<option>'+z[0]+'</option>'}).join("");
+
 function render(){
-  var g=+$("g").value,b=+$("b").value,t=$("t").value,ranged=!!(IN&&OUT),n=ranged?nights(IN,OUT):0,season=ranged&&IN===SS&&OUT===SE;
+  var TA=$("ta").value,cal=(TA==="tur"||TA==="fds");
+  $("calD").hidden=!cal;$("gaLab").hidden=cal;
+  var g=+$("g").value,b=+$("b").value,t=$("t").value,AM=$("am").value,GA=cal?"":$("ga").value,ORD=$("ord").value;
+  ZONE=$("zn").value;
+  var ranged=cal&&!!(IN&&OUT),n=ranged?nights(IN,OUT):0;
+  $("mpLab").firstChild.nodeValue="Precio máximo "+(TA==="anu"?"por mes":TA==="tra"?"de la temporada":"por noche");
   var mp=+$("mp").value||0;
-  var pn=function(x){return !ranged?minP(x):(season&&x.ps?x.ps/n:quote(x,IN,OUT)/n)};
-  var pre=L.filter(function(x){return (ADMIN||x.v)&&x.g>=g&&x.b<=b&&(!t||x.t===t)&&(!mp||pn(x)<=mp)});
-  var base=pre.filter(function(x){return !ranged||(okRule(x,IN,OUT)&&(!season||x.ts))});
+  var key=function(x){return ranged?quote(x,IN,OUT)/n:pk(x,TA)};
+  var pre=L.filter(function(x){return (ADMIN||x.v)&&(ONLY||(ADMIN?tipos(x):offered(x)).indexOf(TA)>-1)&&x.g>=g&&x.b<=b&&(!t||x.t===t)&&(!AM||x.am)&&(!GA||(GA==="si"?!!x.gar:!x.gar))&&(!mp||!key(x)||key(x)<=mp)&&(!ONLYFAV||FAV.indexOf(x.id)>-1)});
+  var base=pre.filter(function(x){return !ranged||TA==="fds"||okRule(x,IN,OUT)});
   var hid=pre.length-base.length;
   var isB=function(x){return ranged&&!isFree(x,IN,OUT)};
   var items=base.filter(function(x){return (!ZONE||x.z===ZONE)&&(!ONLY||String(x.id)===ONLY)});
-  items.sort(function(a,c){return isB(a)-isB(c)||minP(a)-minP(c)});
+  var kv=function(x){var k=key(x);return k>0?k:(ORD==="desc"?-1:1e15)};
+  items.sort(function(a,c){return isB(a)-isB(c)||(ORD==="desc"?kv(c)-kv(a):kv(a)-kv(c))});
   var free=items.filter(function(x){return !isB(x)}).length;
   $("count").textContent=(ranged?free+" disponibles del "+fmt(IN)+" al "+fmt(OUT):items.length+" alojamientos")+(hid&&ranged?". "+hid+" no alquilan esas fechas por sus condiciones.":"");
   $("foot").textContent=L.some(function(x){return x.demo})?"Avisos y precios de ejemplo.":"";
   if(ADMIN){var st=L.filter(stale).length;$("adminMsg").textContent=st?st+" avisos sin actualizar hace más de 15 días":"Todos los avisos están al día"}
-  $("chipBox").innerHTML=(ZONE?'<button class="chip" id="chip">Zona: '+esc(ZONE)+' ×</button> ':"")+(ONLY?'<button class="chip" id="chip2">Ver todos los alojamientos ×</button>':"");
-  drawMap(base,isB);
+  $("chipBox").innerHTML=ONLY?'<button class="chip" id="chip2">Ver todos los alojamientos ×</button>':"";
+  $("favBtn").setAttribute("aria-pressed",ONLYFAV);$("favBtn").textContent=(ONLYFAV?"♥":"♡")+" Ver solo favoritos";
   var out="";
   items.forEach(function(x){
-    var busy=isB(x),pr,sub;
-    if(!ranged){pr=ars(minP(x));sub=(x.pj&&x.pj!==x.p?"por noche · enero "+ars(x.pj)+", resto "+ars(x.p):"por noche")+". Elegí fechas para ver el total."}
-    else if(season){pr=x.ps?ars(x.ps):"A consultar";sub=x.ps?n+" noches · "+ars(x.ps/n)+" por noche":"Pedí el precio de temporada"}
+    var busy=isB(x),pr,sub,fav=FAV.indexOf(x.id)>-1;
+    if(TA==="anu"){var v=pk(x,TA);pr=v?ars(v):"A consultar";sub="por mes"+(x.ex?" · Expensas: "+esc(x.ex):"")+(x.dd?" · Disponible desde "+fmt(x.dd):"")}
+    else if(TA==="tra"){pr=x.ps?ars(x.ps):"A consultar";sub="toda la temporada"+(x.dd?" · Disponible desde "+fmt(x.dd):"")}
+    else if(!ranged){pr=minP(x)?ars(minP(x)):"A consultar";sub=(x.pj&&x.pj!==x.p?"por noche · enero "+ars(x.pj)+", resto "+ars(x.p):"por noche")+(TA==="fds"?". Sin mínimo de noches.":". Elegí fechas para ver el total.")}
     else{var q=quote(x,IN,OUT);pr=ars(q);sub=n+" noches · "+ars(q/n)+" por noche"}
+    var info="";
+    if(!cal){var li=["<p><strong>Garantía:</strong> "+(x.gar?"Pide garantía":"No pide garantía")+"</p>"];if(x.rq)li.push("<p><strong>Requisitos:</strong> "+esc(x.rq)+"</p>");if(x.sv&&x.sv.length)li.push("<p><strong>Servicios incluidos:</strong> "+esc(x.sv.join(", "))+"</p>");if(x.ex)li.push("<p><strong>Expensas:</strong> "+esc(x.ex)+"</p>");info='<details class="info" open><summary>Requisitos y servicios</summary>'+li.join("")+'</details>'}
     var msg=encodeURIComponent("Hola"+(x.o?" "+x.o:"")+", vi “"+x.n+"” en Alquileres en Miramar"+(ranged?" y quiero consultar disponibilidad del "+fmt(IN)+" al "+fmt(OUT)+".":"."));
+    var rep=encodeURIComponent("Quiero denunciar el aviso “"+x.n+"” (id "+x.id+").");
     var ph=(x.fotos&&x.fotos.length)?x.fotos.map(function(u){return '<img loading="lazy" alt="Foto de '+esc(x.n)+'" src="'+esc(u)+'">'}).join(""):'<div class="ph" style="background:linear-gradient(135deg,#0B3C49,#1B6E82)">Sin fotos todavía</div>';
     out+='<article class="card'+(busy?' busy':'')+'"><div style="position:relative"><div class="photo">'+ph+'</div><span class="tag">'+esc(x.t)+' · '+x.b+(x.b===1?' cuadra':' cuadras')+' del mar</span></div>'
     +'<div class="body"><h3>'+esc(x.n)+(x.v?'':' <span class="hidden-tag">(oculta)</span>')+'</h3>'
-    +'<p class="meta">'+esc(x.z)+' · hasta '+x.g+' personas'+(x.o?' · '+esc(x.o):'')+'<br>Ingreso '+CHECKIN+' · Salida '+CHECKOUT+(x.u?'<br>Fechas actualizadas el '+fmt(x.u):'')+'</p>'
+    +(x.vf?'<p class="ver">✔ Verificado por la administración · '+fmt(x.vf)+'</p>':(ADMIN?'<p class="warn">Sin verificar</p>':''))
+    +(ADMIN&&x.alq?'<p class="warn">Todo el año: alquilado, oculto al público</p>':'')+'<p class="meta">'+esc(x.z)+' · hasta '+x.g+' personas'+(x.o?' · '+esc(x.o):'')+'<br>Ofrece: '+(ADMIN?tipos(x):offered(x)).map(function(k){return TIPOS[k]}).join(" · ")+(cal?'<br>Ingreso '+CHECKIN+' · Salida '+CHECKOUT:'')+(x.u?'<br>Actualizado el '+fmt(x.u):'')+'</p>'
     +(x.d?'<p class="desc">'+esc(x.d)+'</p>':'')
-    +'<p class="rule">'+ruleText(x)+'</p>'+((x.rg||x.cn)?'<details class="info"><summary>Reglas y cancelación</summary>'+(x.rg?'<p><strong>Reglas de la casa:</strong> '+esc(x.rg)+'</p>':'')+(x.cn?'<p><strong>Cancelación:</strong> '+esc(x.cn)+'</p>':'')+'</details>':'')+(ADMIN&&stale(x)?'<p class="warn">'+staleText(x)+'</p>':'')
-    +'<ul class="perks">'+factsList(x).concat(x.k||[]).map(function(p){return '<li>'+esc(p)+'</li>'}).join("")+'</ul>'
+    +'<p class="rule">'+ruleLine(x,TA)+'</p>'+info+((x.rg||x.cn)?'<details class="info"><summary>Reglas y cancelación</summary>'+(x.rg?'<p><strong>Reglas de la casa:</strong> '+esc(x.rg)+'</p>':'')+(x.cn?'<p><strong>Cancelación:</strong> '+esc(x.cn)+'</p>':'')+'</details>':'')+(ADMIN&&stale(x)?'<p class="warn">'+staleText(x)+'</p>':'')
+    +'<ul class="perks">'+(x.am?["Amueblado"]:[]).concat(factsList(x),x.k||[]).map(function(p){return '<li>'+esc(p)+'</li>'}).join("")+'</ul>'
     +'<div class="row"><div class="price"><strong>'+pr+'</strong><small>'+sub+'</small></div><div class="actions">'
     +(ADMIN?'<button class="btn alt" data-edit="'+x.id+'">Editar</button>':'')
+    +'<button class="btn alt" data-fav="'+x.id+'" aria-pressed="'+fav+'" aria-label="Guardar en favoritos">'+(fav?'♥':'♡')+'</button>'
+    +(x.dir?'<a class="btn alt" target="_blank" rel="noopener" href="'+esc(mapUrl(x))+'">Ver en el mapa</a>':'')
     +'<a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent(x.n+" en Miramar: "+PAGE_URL+"#a"+x.id)+'">Compartir</a>'+(x.ph?'<a class="btn alt" href="tel:'+esc(x.ph.replace(/[^\d+]/g,""))+'">Llamar</a>':'')
     +(busy?'<span class="btn wa">Ocupada</span>':'<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/'+waNum(x.w)+'?text='+msg+'">WhatsApp</a>')
-    +'</div></div></div></article>';
+    +'</div></div><p class="rep"><a target="_blank" rel="noopener" href="https://wa.me/'+ADMIN_WA+'?text='+rep+'">Denunciar este aviso</a></p></div></article>';
   });
   $("list").innerHTML=out||'<div class="empty">No hay alojamientos con estos filtros. Probá con otras fechas, menos personas u otra zona.</div>';
 }
-function drawMap(base,isB){
-  var s='<rect x="238" y="0" width="82" height="250" fill="var(--seabg)"/><path d="M238 0 C228 60 250 100 236 150 S232 220 240 250" fill="none" stroke="var(--sea)" stroke-width="3"/><text x="282" y="125" fill="var(--sea)" font-size="14" font-weight="700" text-anchor="middle" font-family="Source Sans 3,sans-serif">Mar</text>';
-  ZONES.forEach(function(z){
-    var n=base.filter(function(x){return x.z===z[0]&&!isB(x)}).length,on=ZONE===z[0];
-    s+='<g class="z" data-z="'+z[0]+'" role="button" tabindex="0" aria-pressed="'+on+'" aria-label="'+z[0]+': '+n+' disponibles"><circle cx="'+z[1]+'" cy="'+z[2]+'" r="31"/><text class="n" x="'+z[1]+'" y="'+(z[2]-2)+'">'+n+'</text><text x="'+z[1]+'" y="'+(z[2]+13)+'">'+z[0]+'</text></g>';
-  });
-  $("map").innerHTML=s;
-}
-function pickZone(z){ZONE=(ZONE===z?"":z);render()}
-$("map").addEventListener("click",function(e){var g=e.target.closest("[data-z]");if(g)pickZone(g.dataset.z)});
-$("map").addEventListener("keydown",function(e){var g=e.target.closest("[data-z]");if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();pickZone(g.dataset.z)}});
+$("list").addEventListener("click",function(e){var f=e.target.closest("[data-fav]");if(!f)return;var id=+f.dataset.fav,i=FAV.indexOf(id);if(i>-1)FAV.splice(i,1);else FAV.push(id);saveFav();render()});
+$("favBtn").addEventListener("click",function(){ONLYFAV=!ONLYFAV;render()});
 $("chipBox").addEventListener("click",function(e){if(e.target.closest("#chip")){ZONE="";render()}else if(e.target.closest("#chip2")){ONLY="";render()}});
-["g","b","t","mp"].forEach(function(i){$(i).addEventListener("input",render)});
+["g","b","t","mp","ta","am","ga","ord","zn"].forEach(function(i){$(i).addEventListener("input",render)});
 
 /* ---------- administración ---------- */
 function say(s){$("msg").textContent=s}
@@ -334,12 +360,14 @@ $("resAdd").addEventListener("click",function(){
 });
 $("resl").addEventListener("click",function(e){var r=e.target.closest("[data-rr]");if(r){cur.res.splice(+r.dataset.rr,1);drawRes()}});
 function openForm(x){
-  cur=JSON.parse(JSON.stringify(x||{nuevo:true,id:Date.now(),n:"",t:"Casa",z:"Centro",g:4,b:5,p:0,d:"",k:[],o:"",w:"",ph:"",m:"dias",mn:1,gap:false,res:[],ts:false,ps:0,v:true,fotos:[]}));
+  cur=JSON.parse(JSON.stringify(x||{nuevo:true,id:Date.now(),n:"",t:"Casa",z:"Centro",g:4,b:5,p:0,d:"",k:[],o:"",w:"",ph:"",m:"dias",mn:1,gap:false,res:[],ta:["tur"],ps:0,pm:0,pa:0,v:true,fotos:[]}));
   $("fTitle").textContent=x?"Editar alojamiento":"Nuevo alojamiento";
   $("f_n").value=cur.n;$("f_t").value=cur.t;$("f_z").value=cur.z;$("f_g").value=cur.g;$("f_b").value=cur.b;$("f_p").value=cur.p;$("f_pj").value=cur.pj||"";$("f_dm").value=cur.dm||"";$("f_ro").checked=!!cur.ro;$("f_ai").checked=!!cur.ai;$("f_ca").checked=!!cur.ca;$("f_ma").checked=!!cur.ma;$("f_rg").value=cur.rg||"";$("f_cn").value=cur.cn||"";
   $("f_d").value=cur.d;$("f_k").value=(cur.k||[]).join(", ");$("f_o").value=cur.o;$("f_w").value=cur.w;$("f_ph").value=cur.ph||"";
   $("f_m").value=cur.m;$("f_mn").value=cur.mn||1;$("mnLab").hidden=cur.m!=="dias";$("f_gap").checked=!!cur.gap;
-  $("f_ts").checked=!!cur.ts;$("f_ps").value=cur.ps||"";$("f_v").checked=!!cur.v;
+  $("f_ps").value=cur.ps||"";$("f_pa").value=cur.pa||"";$("f_dd").value=cur.dd||"";$("f_ex").value=cur.ex||"";$("f_am").checked=!!cur.am;$("f_gar").checked=!!cur.gar;$("f_alq").checked=!!cur.alq;$("f_rq").value=cur.rq||"";$("f_dir").value=cur.dir||"";$("f_vf").checked=!!cur.vf;
+  var TT=tipos(cur);[].slice.call(document.querySelectorAll("[data-ta]")).forEach(function(c){c.checked=TT.indexOf(c.dataset.ta)>-1});
+  [].slice.call(document.querySelectorAll("[data-sv]")).forEach(function(c){c.checked=(cur.sv||[]).indexOf(c.dataset.sv)>-1});$("f_v").checked=!!cur.v;
   $("delBtn").hidden=!x;$("f_files").value="";say("");drawThumbs();drawRes();$("dlg").showModal();
 }
 async function shrink(file){
@@ -352,7 +380,7 @@ $("f_files").addEventListener("change",async function(){
   if(!ADMIN||!db)return;
   say("Subiendo fotos…");
   try{for(var f of this.files){var path=Date.now()+"_"+Math.random().toString(36).slice(2,7)+".jpg";var up=await db.storage.from(BUCKET).upload(path,await shrink(f),{contentType:"image/jpeg"});if(up.error)throw up.error;cur.fotos.push(db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl)}drawThumbs();say("")}
-  catch(e){say("No se pudo subir la foto: "+((e&&e.message)||e))}
+  catch(e){say("No se pudo subir la foto: "+((e&&(e.message||e.code))||e))}
 });
 $("thumbs").addEventListener("click",function(e){var r=e.target.closest("[data-rm]");if(r){cur.fotos.splice(+r.dataset.rm,1);drawThumbs()}});
 $("addBtn").addEventListener("click",function(){openForm(null)});
@@ -363,8 +391,12 @@ $("saveBtn").addEventListener("click",async function(){
   cur.d=$("f_d").value.trim();cur.k=$("f_k").value.split(",").map(function(s){return s.trim()}).filter(Boolean);
   cur.o=$("f_o").value.trim();cur.w=$("f_w").value.trim();cur.ph=$("f_ph").value.trim();cur.v=$("f_v").checked;
   cur.m=$("f_m").value;cur.mn=Math.max(1,+$("f_mn").value||1);cur.gap=$("f_gap").checked;
-  cur.ts=$("f_ts").checked;cur.ps=+$("f_ps").value||0;delete cur.demo;
-  if(!cur.n||!cur.w||!cur.p){say("Completá nombre, precio y WhatsApp.");return}
+  cur.ps=+$("f_ps").value||0;cur.pa=+$("f_pa").value||0;cur.dd=$("f_dd").value;cur.ex=$("f_ex").value.trim();cur.am=$("f_am").checked;cur.gar=$("f_gar").checked;cur.alq=$("f_alq").checked;cur.rq=$("f_rq").value.trim();cur.dir=$("f_dir").value.trim();
+  cur.ta=[].slice.call(document.querySelectorAll("[data-ta]")).filter(function(c){return c.checked}).map(function(c){return c.dataset.ta});
+  cur.sv=[].slice.call(document.querySelectorAll("[data-sv]")).filter(function(c){return c.checked}).map(function(c){return c.dataset.sv});
+  if($("f_vf").checked){if(!cur.vf)cur.vf=todayISO()}else cur.vf="";
+  delete cur.ts;delete cur.demo;
+  if(!cur.n||!cur.w||!cur.ta.length){say("Completá nombre, WhatsApp y al menos un tipo de alquiler.");return}
   say("Guardando…");
   try{await guardar(cur);$("dlg").close()}catch(e){say("No se pudo guardar: "+(e.message||e))}
 });
@@ -374,7 +406,7 @@ $("delBtn").addEventListener("click",async function(){
 });
 $("outBtn").addEventListener("click",async function(){await db.auth.signOut();ADMIN=false;$("adminBar").hidden=true;render()});
 async function cargar(){
-  if(!db){$("list").innerHTML='<div class="empty">Falta configurar la conexión con Supabase.</div>';return}
+  if(!db){$("list").innerHTML='<div class="empty">No se pudo conectar con la base de datos.</div>';return}
   var r=await db.from("avisos").select("*").order("id",{ascending:true});
   if(r.error){$("list").innerHTML='<div class="empty">No se pudo conectar con la base de datos.</div>';return}
   L=r.data.map(function(row){return Object.assign({},row.datos,{id:row.id})});render();
@@ -383,13 +415,11 @@ function entrarAdmin(){ADMIN=true;$("adminBar").hidden=false;render()}
 $("loginLink").addEventListener("click",function(){$("l_msg").textContent="";$("ldlg").showModal()});
 $("l_c").addEventListener("click",function(){$("ldlg").close()});
 $("l_ok").addEventListener("click",async function(){
-  if(!db){$("l_msg").textContent="Falta configurar Supabase.";return}
-  $("l_msg").textContent="Ingresando…";
+  if(!db)return;$("l_msg").textContent="Ingresando…";
   var r=await db.auth.signInWithPassword({email:$("l_m").value.trim(),password:$("l_p").value});
   if(r.error){$("l_msg").textContent="Correo o contraseña incorrectos.";return}
   $("l_p").value="";$("ldlg").close();entrarAdmin();
 });
 drawCal();$("list").innerHTML='<div class="empty">Cargando…</div>';cargar();
 if(db)db.auth.getSession().then(function(s){if(s.data.session)entrarAdmin()});
-if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
 </script></body></html>
